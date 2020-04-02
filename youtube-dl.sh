@@ -1,5 +1,5 @@
 #!/bin/bash
-download='/mnt/d/Sandipan Mistry/Downloads' #set output path
+download='~' #set output path
 
 red=`tput setaf 1` 
 orange=`tput setaf 3`
