@@ -1,5 +1,5 @@
 # Youtube-DL Automation Script
-<p align="center"><img src="https://raw.githubusercontent.com/he2a/youtube-dl-automation-script/master/images/screenshot.png"></p>
+<p align="center"><img src="https://github.com/he2a/youtube-dl-automation-script/raw/master/screen/screenshot.png"></p>
 ## Usage
 Small script to download audio or video off youtube/soundcloud/other sites supported by youtube-dl. Before using, set the `$download` path to your choice. 
 
