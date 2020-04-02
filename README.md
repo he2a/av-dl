@@ -1,7 +1,8 @@
 # Youtube-DL Automation Script
 <p align="center"><img src="https://github.com/he2a/youtube-dl-automation-script/raw/master/screen/screenshot.png"></p>
+
 ## Usage
-Small script to download audio or video off youtube/soundcloud/other sites supported by youtube-dl. Before using, set the `$download` path to your choice. 
+Small script to download audio or video off youtube/soundcloud/other sites supported by youtube-dl. Before using, set the download path to your choice. 
 
 This script was made for use in WSL2 environment in windows and not tested in actual linux. For using in termux, modify the download path to android equivalent, save the file as `termux-url-opener` in `~/bin/` and then make it executable using `chmod +x termux-url-opener`.
 
