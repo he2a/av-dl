@@ -11,4 +11,4 @@ For downloading audio off youtube video, it centre crops the video thumbnail at 
 For SoundCloud, it downloads the audio file and embeds song cover art.
 
 ## Requirement
-This script requires the latest version of ffmpeg, youtube-dl, python, imagemagick. For android, download termux first.
+This script requires the latest version of ffmpeg, youtube-dl, python, imagemagick. For android, download termux first. This script was made for use in WSL2 environment in windows and not tested in actual linux.
