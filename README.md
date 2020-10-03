@@ -1,19 +1,20 @@
 # Youtube-DL Automation Script
-<p align="center"><img src="https://github.com/he2a/youtube-dl-automation-script/raw/master/screen/screenshot.png"></p>
 
-## Usage
-Small script to download audio or video off youtube/soundcloud/other sites supported by youtube-dl. Before using, set the download path to your choice. 
+Small script to download audio or video off youtube, soundcloud and other sites supported by youtube-dl. Made for use in WSL1 environment in Windows 10, but should work in any linux distro without any problem. 
 
-This script was made for use in WSL environment in windows and not tested in actual linux. For using in termux, modify the download path to android equivalent, save the file as `termux-url-opener` in `~/bin/` and then make it executable using `chmod +x termux-url-opener`.
-
-## Basic Overview
-Pretty much downloads from any video sites supported by youtube-dl. More documentation on site supported is available at the official <a href="https://ytdl-org.github.io/youtube-dl/index.html">youtube-dl repo.</a>
-
-For youtube video, it downloads the highest quality video possible and embeds the subtitle file. 
-For downloading audio off youtube video, it centre crops the video thumbnail at 1:1 ratio and removes any black bar to get a nice pseudo  album art. 
-For SoundCloud, it downloads the audio file and embeds song cover art.
+## Features
+This script has four basic behaviours for different content.
+- For youtube video, downloads the best possible quality for video and embeds subtitle if available. 
+- For youtube audio, selectively downloads the best possible audio stream, crops the thumbnail to 1:1 ratio while trimming any black bars, then embeds it in 320k mp3 output.
+- For soundcloud songs, downloads the audio file and embeds the cover art. 
+- For other sites default behaviour is to download best possible quality.
 
 ## Requirement
-* `python` for use in youtube-dl.
-* `youtube-dl` for downloading video/audio.
-* `imagemagick` for audio cover art creation.
+- `youtube-dl` for downloading video/audio.
+- `ffmpeg` for media conversion.
+- `imagemagick` for cover art creation.
+
+## Installation
+Make sure you have [youtube-dl](https://github.com/ytdl-org/youtube-dl), [ffmpeg](https://github.com/FFmpeg/FFmpeg) and [imagemagick](https://github.com/ImageMagick/ImageMagick) already installed and updated in your WSL1 installation. 
+Clone this repo using `git clone https://github.com/he2a/youtube-dl-automation-script youtube-dl-downloader`. Inside you will find youtube-dl.sh file. Run `chmod +x youtube-dl.sh` inside the directory to make it executable. 
+Now, open the script using your text editor and change the download path to your choice and you are ready to use it.
