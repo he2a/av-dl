@@ -11,7 +11,7 @@ if [ -z "$1" ]; then
 	echo -n 'Enter URL: '
 	read url
 else
-	url=$1
+	url=$(echo $1|egrep -o 'https?://[^ ]+')
 fi
 
 cd "$download"
