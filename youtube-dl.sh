@@ -1,7 +1,7 @@
 #!/bin/bash
 download='~' #set output path
 
-red=`tput setaf 1` 
+red=`tput setaf 1`
 orange=`tput setaf 3`
 magenta=`tput setaf 5`
 cyan=`tput setaf 6`
@@ -16,16 +16,6 @@ fi
 
 cd "$download"
 clear
-echo "${magenta}"
-echo "________________________________________________________________________________________________________________________"
-echo " __   __        _        _             ___  _        _       _                  _   _            ___         _      _   "
-echo " \ \ / /__ _  _| |_ _  _| |__  ___ ___|   \| |      /_\ _  _| |_ ___ _ __  __ _| |_(_)___ _ _   / __| __ _ _(_)_ __| |_ "
-echo "  \ V / _ \ || |  _| || | '_ \/ -_)___| |) | |__   / _ \ || |  _/ _ \ '  \/ _\` |  _| / _ \ ' \  \__ \/ _| '_| | '_ \  _|"
-echo "   |_|\___/\_,_|\__|\_,_|_.__/\___|   |___/|____| /_/ \_\_,_|\__\___/_|_|_\__,_|\__|_\___/_||_| |___/\__|_| |_| .__/\__|"
-echo "                                                                                                              |_|       "
-echo "________________________________________________________________________________________________________________________"
-echo "${reset}"
-
 echo -n 'URL: '
 echo $url
 echo -n 'Title: '
@@ -58,24 +48,26 @@ case $flag in
 				echo "Downloading audio: $title.mp3"
 				echo ''
 				#thumbnail crop center 1:1
-				youtube-dl --quiet --write-thumbnail --skip-download -o 'Music/thumb.jpg' $url
-				DD=`identify -format "%[fx:min(w,h)]" Music/thumb.jpg`
-				convert 'Music/thumb.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'Music/thumb.jpg'
-				mogrify -fuzz 10% -define trim:percent-background=0% -trim +repage -format jpg 'Music/thumb.jpg'
-				DD=`identify -format "%[fx:min(w,h)]" Music/thumb.jpg`
-				convert 'Music/thumb.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'Music/thumb.jpg'
-				
+				youtube-dl --quiet --write-thumbnail --skip-download -o 'Music/thumb_temp' $url
+				convert 'Music/thumb_temp*' 'Music/cover.jpg'
+				DD=`identify -format "%[fx:min(w,h)]" Music/cover.jpg`
+				convert 'Music/cover.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'Music/cover.jpg'
+				mogrify -fuzz 10% -define trim:percent-background=0% -trim +repage 'Music/cover.jpg'
+				DD=`identify -format "%[fx:min(w,h)]" Music/cover.jpg`
+				convert 'Music/cover.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'Music/cover.jpg'
+
 				#audio stream download
 				youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "Music/out.%(ext)s" $url
-				
+
 				#embedding thumbnail
-				ffmpeg -i 'Music/out.wav' -i 'Music/thumb.jpg' -map 0:0 -map 1:0 -acodec libmp3lame -b:a 320K -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "Music/$title.mp3"
-				
+				ffmpeg -i 'Music/out.wav' -i 'Music/cover.jpg' -map 0:0 -map 1:0 -acodec libmp3lame -b:a 320K -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "Music/$title.mp3"
+
 				#removing temp files
-				rm 'Music/out.wav'
-				rm 'Music/thumb.jpg'
+				rm Music/out.wav
+				rm Music/cover.jpg
+				rm Music/thumb_temp*
 			;;
-			
+
 			v | V | video | Video | 2)
 				echo "Downloading video: $title.mkv"
 				echo ''
