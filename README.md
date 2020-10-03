@@ -16,5 +16,5 @@ This script has four basic behaviours for different content.
 
 ## Installation
 Make sure you have [youtube-dl](https://github.com/ytdl-org/youtube-dl), [ffmpeg](https://github.com/FFmpeg/FFmpeg) and [imagemagick](https://github.com/ImageMagick/ImageMagick) already installed and updated in your WSL1 installation. 
-Clone this repo using `git clone https://github.com/he2a/youtube-dl-automation-script youtube-dl-downloader`. Inside you will find youtube-dl.sh file. Run `chmod +x youtube-dl.sh` inside the directory to make it executable. 
+Clone this repo using `git clone https://github.com/he2a/youtube-dl-automation-script youtube-dl-downloader`. Inside you will find `youtube-dl.sh` file. Run `chmod +x youtube-dl.sh` inside the directory to make it executable. 
 Now, open the script using your text editor and change the download path to your choice and you are ready to use it.
