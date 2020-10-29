@@ -18,7 +18,7 @@ PINK="\033[0;95m"
 GREEN="\033[0;32m"
 NORMAL="\033[0;39m"
 
-download=~ # Set output path
+download=~/storage # Set output path
 cd "$download"
 
 echo -e "${BLUE}URL:${NORMAL} $url"			
@@ -55,55 +55,55 @@ case $flag in
 		case $ytc in
 			a | A | audio | Audio | AUDIO | 1)				
 				y=1
-				youtube-dl --write-thumbnail --skip-download -o 'Music/thumb_temp' $url
-				while [ ! -f Music/thumb_temp* ];
+				youtube-dl --write-thumbnail --skip-download -o 'music/thumb_temp' $url
+				while [ ! -f music/thumb_temp* ];
 				do
 					echo -e "${ERR}ERROR:${NORMAL} Thumbnail fetch unsuccessful. Retry attempt: $y"
 					echo ''
-					youtube-dl --write-thumbnail --skip-download -o 'Music/thumb_temp' $url
+					youtube-dl --write-thumbnail --skip-download -o 'music/thumb_temp' $url
 					y=$((y+1))
 					if [ $y -eq 11 ]; then
 						echo -e "${ERR}ERROR:${NORMAL} Fetching thumbnail failed. Downloading generic cover."
-						curl https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?ixid=eyJhcHBfaWQiOjEyMDd9 --output 'Music/thumb_temp.jpg'
+						curl https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?ixid=eyJhcHBfaWQiOjEyMDd9 --output 'music/thumb_temp.jpg'
 						echo ''
 					fi
 				done
 				echo ''
 				
-				convert 'Music/thumb_temp*' 'Music/cover.jpg' >/dev/null
-				DD=`identify -format "%[fx:min(w,h)]" Music/cover.jpg`
-				convert 'Music/cover.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'Music/cover.jpg'
-				mogrify -fuzz 10% -define trim:percent-background=0% -trim +repage 'Music/cover.jpg'
-				DD=`identify -format "%[fx:min(w,h)]" Music/cover.jpg`
-				convert 'Music/cover.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'Music/cover.jpg'
+				convert 'music/thumb_temp*' 'music/cover.jpg' >/dev/null
+				DD=`identify -format "%[fx:min(w,h)]" music/cover.jpg`
+				convert 'music/cover.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'music/cover.jpg'
+				mogrify -fuzz 10% -define trim:percent-background=0% -trim +repage 'music/cover.jpg'
+				DD=`identify -format "%[fx:min(w,h)]" music/cover.jpg`
+				convert 'music/cover.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'music/cover.jpg'
 				
 				z=1
-				youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "Music/out.%(ext)s" $url
-				while [ ! -f 'Music/out.wav' ];
+				youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "music/out.%(ext)s" $url
+				while [ ! -f 'music/out.wav' ];
 				do
 					echo -e "${ERR}ERROR:${NORMAL} Music stream fetch unsuccessful. Retry attempt: $z"
 					echo ''
-					youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "Music/out.%(ext)s" $url
+					youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "music/out.%(ext)s" $url
 					z=$((z+1))
 					if [ $z -eq 11 ]; then
 						echo -e "${ERR}ERROR:${NORMAL} Unable to download audio stream."
-						rm Music/cover.jpg
-						rm Music/thumb_temp*
+						rm music/cover.jpg
+						rm music/thumb_temp*
 						exit
 					fi
 				done
 				echo ''
 				
-				ffmpeg -hide_banner -loglevel warning -stats -i 'Music/out.wav' -i 'Music/cover.jpg' -map 0:0 -map 1:0 -acodec libmp3lame -b:a 320K -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "Music/$title.mp3"
+				ffmpeg -hide_banner -loglevel warning -stats -i 'music/out.wav' -i 'music/cover.jpg' -map 0:0 -map 1:0 -acodec libmp3lame -b:a 320K -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "music/$title.mp3"
 
 
-				rm Music/out.wav
-				rm Music/cover.jpg
-				rm Music/thumb_temp*
+				rm music/out.wav
+				rm music/cover.jpg
+				rm music/thumb_temp*
 				;;
 
 			v | V | video | Video | VIDEO | 2)
-				youtube-dl -f 'bestvideo+bestaudio/best' --merge-output-format mkv --write-sub --sub-lang en --embed-subs -o "Video/$title.mkv" $url
+				youtube-dl -f 'bestvideo+bestaudio/best' --merge-output-format mkv --write-sub --sub-lang en --embed-subs -o "movies/$title.mkv" $url
 			;;
 		esac
 	;;	
@@ -111,12 +111,12 @@ case $flag in
 	s)
 		echo -e "${YELLOW}SoundCloud${NORMAL} URL Detected."
 		echo ''
-		youtube-dl --embed-thumbnail -o 'Music/%(title)s.%(ext)s' $url
+		youtube-dl --embed-thumbnail -o 'music/%(title)s.%(ext)s' $url
 	;;
 
 	o)
 		echo -e "${PINK}Generic${NORMAL} URL Detected. Attempting download with youtube-dl."
 		echo ''
-		youtube-dl -f 'bestvideo+bestaudio/best' $url  -o "Video/%(id)s.%(ext)s"
+		youtube-dl -f 'bestvideo+bestaudio/best' $url  -o "movies/%(id)s.%(ext)s"
 	;;
 esac
