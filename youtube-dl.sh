@@ -12,17 +12,6 @@ attempt=10
 # Select default thumbnail for youtube music (in case failed to download cover)
 thumb=https://www.xda-developers.com/files/2018/05/youtube-music-logo-1.png
 
-# Innitialize URL if not provided in argument
-clear
-if [ -z "$1" ]; then
-	echo -n 'Enter URL: '
-	read url
-else
-	url=$(echo $1|egrep -o 'https?://[^ ]+') # Extracting url from apps which shares a message instead of url
-fi
-clear
-
-
 # Color codes
 ERR="\033[31m"
 RED="\033[0;91m"
@@ -32,8 +21,18 @@ PINK="\033[0;95m"
 GREEN="\033[0;32m"
 NORMAL="\033[0;39m"
 
-echo -e "${BLUE}URL:${NORMAL} $url"
+# Innitialize URL if not provided in argument
+clear
+if [ -z "$1" ]; then
+	echo -n -e "${BLUE}URL:${NORMAL} $url"
+	read url
+else
+	url=$(echo $1|egrep -o 'https?://[^ ]+') # Extracting url from apps which shares a message instead of url
+fi
+clear
 
+echo -e "${BLUE}URL:${NORMAL} $url"
+echo ''
 # Fetch title for file name
 x=1
 title=$(youtube-dl --get-title $url)
@@ -80,7 +79,7 @@ case $flag in
 				do
 					if [ $y -eq $attempt ]; then
 						echo -e "${ERR}ERROR:${NORMAL} Fetching thumbnail failed. Using generic cover."
-						curl $thumb --output 'temp/thumb_temp.png'
+						curl $thumb --create-dirs --output 'temp/thumb_temp.png'
 						echo ''
 					else
 						echo -e "${ERR}ERROR:${NORMAL} Thumbnail fetch unsuccessful. Retry attempt: $y"
@@ -101,7 +100,7 @@ case $flag in
 
 				# Fetch audio stream
 				z=1
-				youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp/out.wav" $url
+				youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp/out.%(ext)s" $url
 				while [ ! -f 'temp/out.wav' ];
 				do
 					if [ $z -eq $attempt ]; then
@@ -111,7 +110,7 @@ case $flag in
 					else
 						echo -e "${ERR}ERROR:${NORMAL} Music stream fetch unsuccessful. Retry attempt: $z"
 						echo ''
-						youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp/out" $url
+						youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp/out.%(ext)s" $url
 						z=$((z+1))
 					fi
 				done
@@ -126,7 +125,7 @@ case $flag in
 
 			v | V | video | Video | VIDEO | 2)
 				cd "$video"
-				youtube-dl -f 'bestvideo+bestaudio/best' --merge-output-format mkv --write-sub --sub-lang en --embed-subs -o "$title.mkv" $url
+				youtube-dl -f 'bestvideo+bestaudio/best' --merge-output-format mkv --write-sub --sub-lang en --embed-subs -o "$title.%(ext)s" $url
 			;;
 		esac
 	;;
