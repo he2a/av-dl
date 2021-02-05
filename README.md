@@ -14,12 +14,4 @@ This script has four basic behaviours for different content.
 - `ffmpeg` for media conversion.
 
 ## Installation
-Make sure you have [youtube-dl](https://github.com/ytdl-org/youtube-dl) and [ffmpeg](https://github.com/FFmpeg/FFmpeg) already installed and updated. 
-Clone this repo using `git clone https://github.com/he2a/youtube-dl-automation-script youtube-dl-downloader`. Inside you will find `youtube-dl.sh` file. Run `chmod +x youtube-dl.sh` inside the directory to make it executable. 
-Now, open the script using your text editor and change the download path to your choice and you are ready to use it.
-
-## Upcoming Features
-- More configurable option.
-- Clean up code.
-- Termux menu support.
-- Music metadata fetching.
+Make sure you have [youtube-dl](https://github.com/ytdl-org/youtube-dl) and [ffmpeg](https://github.com/FFmpeg/FFmpeg) already installed and updated. Clone this repo using `git clone https://github.com/he2a/youtube-dl-automation-script youtube-dl-downloader`. Inside you will find `youtube-dl.sh` file. Run `chmod +x youtube-dl.sh` inside the directory to make it executable. Now, open the script using your text editor and change the download path to your choice and you are ready to use it.
