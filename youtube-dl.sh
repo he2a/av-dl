@@ -7,7 +7,7 @@ music=~/storage/music
 video=~/storage/movies
 
 # Number of retry attempt
-attempt=10
+attempt=3
 
 # Select default thumbnail for youtube music (in case failed to download cover)
 thumb=https://www.xda-developers.com/files/2018/05/youtube-music-logo-1.png
@@ -74,34 +74,38 @@ case $flag in
 
 				# Fetch thumbnail off video
 				y=1
-				youtube-dl --write-thumbnail --skip-download -o 'temp/thumb_temp' $url
-				while [ ! -f temp/thumb_temp.* ];
+				youtube-dl --write-thumbnail --skip-download -o 'temp_ytdl/thumb_temp' $url
+				while [ ! -f temp_ytdl/thumb_temp.* ];
 				do
 					if [ $y -eq $attempt ]; then
 						echo -e "${ERR}ERROR:${NORMAL} Fetching thumbnail failed. Using generic cover."
-						curl $thumb --create-dirs --output 'temp/thumb_temp.png'
+						curl $thumb --create-dirs --output 'temp_ytdl/thumb_temp.png'
 						echo ''
 					else
 						echo -e "${ERR}ERROR:${NORMAL} Thumbnail fetch unsuccessful. Retry attempt: $y"
 						echo ''
-						youtube-dl --write-thumbnail --skip-download -o 'temp/thumb_temp' $url
+						youtube-dl --write-thumbnail --skip-download -o 'temp_ytdl/thumb_temp' $url
 						y=$((y+1))
 					fi
 				done
 				echo ''
-
-				# Crop image in 1:1 ratio, remove black bar and repeat crop to 1:1 ratio
-				# Done to remove some pesky logos which conflict with black bar detection
-				DD=`identify -format "%[fx:min(w,h)]" temp/thumb_temp.*`
-				convert 'temp/thumb_temp.*' -gravity center -crop ${DD}x${DD}+0+0 +repage 'temp/cover.jpg'
-				mogrify -fuzz 10 -define trim:percent-background=0% -trim +repage 'temp/cover.jpg'
-				DD=`identify -format "%[fx:min(w,h)]" temp/cover.jpg`
-				convert 'temp/cover.jpg' -gravity center -crop ${DD}x${DD}+0+0 +repage 'temp/cover.jpg'
-
+				
+				# Using ffmpeg cropdetect to remove black bars.
+				# Cropdetect doesn't work for still images so making dummy video frames.
+				mv temp_ytdl/thumb_temp.* temp_ytdl/thumb_raw
+				
+				ffmpeg -hide_banner -loglevel error -i 'temp_ytdl/thumb_raw' -vf "crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" 'temp_ytdl/thumb001.png'
+				
+				cp temp_ytdl/thumb001.png temp_ytdl/thumb002.png
+				cp temp_ytdl/thumb001.png temp_ytdl/thumb003.png
+				
+				crop=$(ffmpeg -i 'temp_ytdl/thumb%3d.png' -vf "cropdetect=24:1:0" -f null - 2>&1 | egrep -o "crop=[^ ]+")
+				ffmpeg -y -hide_banner -loglevel error -i 'temp_ytdl/thumb001.png' -vf "$crop,crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" 'temp_ytdl/cover.jpg'
+				
 				# Fetch audio stream
 				z=1
-				youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp/out.%(ext)s" $url
-				while [ ! -f 'temp/out.wav' ];
+				youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp_ytdl/out.%(ext)s" $url
+				while [ ! -f 'temp_ytdl/out.wav' ];
 				do
 					if [ $z -eq $attempt ]; then
 						echo -e "${ERR}ERROR:${NORMAL} Unable to download audio stream."
@@ -110,17 +114,17 @@ case $flag in
 					else
 						echo -e "${ERR}ERROR:${NORMAL} Music stream fetch unsuccessful. Retry attempt: $z"
 						echo ''
-						youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp/out.%(ext)s" $url
+						youtube-dl -f 'bestaudio' --extract-audio --audio-format wav -o "temp_ytdl/out.%(ext)s" $url
 						z=$((z+1))
 					fi
 				done
 				echo ''
 
 				# Convert to mp3 and attach thumbnail
-				ffmpeg -hide_banner -loglevel warning -stats -i 'temp/out.wav' -i 'temp/cover.jpg' -map 0:0 -map 1:0 -acodec libmp3lame -b:a 320K -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "$title.mp3"
+				ffmpeg -hide_banner -loglevel error -stats -i 'temp_ytdl/out.wav' -i 'temp_ytdl/cover.jpg' -map 0:0 -map 1:0 -acodec libmp3lame -b:a 320K -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "$title.mp3"
 
 				# Removing temporary files
-				rm -rf temp
+				rm -rf temp_ytdl
 				;;
 
 			v | V | video | Video | VIDEO | 2)
