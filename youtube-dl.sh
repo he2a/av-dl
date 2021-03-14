@@ -4,37 +4,37 @@
 # A simple youtube-dl download script by He2A for downloading songs or video.
 # ----------------------------------------------------------------------------
 
-# Set output path for music
+# Set output path for music.
 music=~/storage/music
 
-# Set output path for video
+# Set output path for video.
 video=~/storage/movies
 
-# Number of retry attempts
+# Number of retry attempts.
 attempt=3
 
-# Force default choice of download 'audio' for audio download / 'video' for video download / blank for manual choice
+# Force default choice of download. Set to 'audio' for audio / 'video' for video / blank for manual choice.
 defchoice=
 
-# Set true to embed cover for audio download
+# Set true to embed cover for audio download.
 embedcover=true
 
-# Set true to use thumbnail as cover for audio download (else uses default cover)
+# Set true to use thumbnail as cover for audio download or false to use default cover.
 coverthumb=true
 
-# Link to the cover image (full link including https) for use as default cover
+# Link to the cover image for use as default cover, including https:// part.
 thumblink=
 
-# Set true to autotrim cover to square for audio download
+# Set true to autotrim cover to square for audio download.
 autotrimthumb=true
 
-# Set true to embed subtitles for video download
+# Set true to embed subtitles for video download.
 embedsubs=true
 
-# Set true to embed auto translated subtitles for youtube videos
+# Set true to embed auto translated subtitles for youtube videos.
 autosubs=true
 
-# Set true to enable verbose mode (for debugging script)
+# Set true to enable verbose mode mainly for debugging the script.
 verbose=false
 
 # ----------------------------------------------------------------------------
