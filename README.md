@@ -1,6 +1,6 @@
-# Youtube-DL Automation Script
+# av-dl - A yt-dlp automation script
 
-Small script to download audio or video off youtube, soundcloud and other sites supported by youtube-dl. Made for use in WSL environment in Windows 10, but should work in any linux distro (including termux in android) without any problem. 
+Small script to download audio or video off youtube, soundcloud and other sites supported by yt-dlp. Made for use in WSL environment in windows, but should work in any linux distro (including termux in android) without any problem. 
 
 ## Features
 This script has two basic behaviours for different content.
@@ -8,11 +8,12 @@ This script has two basic behaviours for different content.
 - For audio, selectively downloads the best possible audio stream, crops the thumbnail to 1:1 ratio while trimming any black bars, then embeds it in V0 MP3 output.
 
 ## Requirement
-- `youtube-dl` for downloading video/audio.
+- `yt-dlp` for downloading video/audio.
+- `python 3.6+` for running yt-dlp.
 - `ffmpeg` for media conversion.
 
 ## Installation
-Make sure you have [youtube-dl](https://github.com/ytdl-org/youtube-dl) and [ffmpeg](https://github.com/FFmpeg/FFmpeg) already installed and updated. Clone this repo using `git clone https://github.com/he2a/youtube-dl-automation-script youtube-dl-downloader`. Inside you will find `youtube-dl.sh` file. Run `chmod +x youtube-dl.sh` inside the directory to make it executable. Now, open the script using your text editor and change the download path to your choice and you are ready to use it.
+Make sure you have [yt-dlp](https://github.com/yt-dlp/yt-dlp) and [ffmpeg](https://github.com/FFmpeg/FFmpeg) already installed and updated. Clone this repo using `git clone https://github.com/he2a/av-dl av-dl`. Inside you will find `av-dl.sh` file. Run `chmod +x av-dl.sh` inside the directory to make it executable. Now, open the script using your text editor and change the download path to your choice and you are ready to use it.
 
 ## Settings
 ```
@@ -44,7 +45,10 @@ autotrimthumb=true
 embedsubs=true
 
 # Set true to embed auto translated subtitles for youtube videos.
-autosubs=true
+autosubs=false
+
+# Set false to show a text instead of logo.
+showlogo=true
 
 # Set true to enable verbose mode mainly for debugging the script.
 verbose=false
