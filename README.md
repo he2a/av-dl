@@ -26,7 +26,7 @@ video=~/storage/movies
 # Number of retry attempts.
 attempt=3
 
-# Force default choice of download. Set to 'audio' for audio / 'video' for video / blank for manual choice.
+# Force default choice of download. Set 'audio' for audio / 'video' for video / blank for manual choice.
 defchoice=
 
 # Set true to embed cover for audio download.
