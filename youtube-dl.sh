@@ -5,10 +5,10 @@
 # ---------------------------------------------------------------------------------
 
 # Set output path for music.
-music="/mnt/c/Users/mistr/Downloads/Music"
+music="~/storage/music"
 
 # Set output path for video.
-video="/mnt/c/Users/mistr/Downloads/Video"
+video="~/storage/movies"
 
 # Number of retry attempts.
 attempt=3
