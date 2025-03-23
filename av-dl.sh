@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Temporary UI bugfix. Change delay if glitchy UI
-sleep 0.1
+#sleep 0.1
 
 # ---------------------------------------------------------------------------------
 # A simple yt-dlp script for downloading songs or video off youtube and other sites
@@ -25,17 +25,17 @@ embedcover=true
 # Set true to use thumbnail as cover for audio download or false to use default cover.
 coverthumb=true
 
-# Link to the cover image for use as default cover, including https:// part.
-thumblink=
-
-# Set true to autotrim cover to square for audio download.
+# Set true to autotrim youtube thumbnail to square for audio download.
 autotrimthumb=true
+
+# Set true to detect black bars in youtube thumbnail.
+smartcrop=true
 
 # Set true to embed subtitles for video download.
 embedsubs=true
 
 # Set true to embed auto translated subtitles for youtube videos.
-autosubs=false
+autosubs=true
 
 # Set false to show a text instead of logo.
 showlogo=true
@@ -48,10 +48,48 @@ verbose=false
 RED="\033[0;91m"
 YELLOW="\033[0;93m"
 BLUE="\033[0;34m"
+PURPLE="\033[0;35m"
+CYAN="\033[0;36m"
 GREEN="\033[0;32m"
 NORMAL="\033[0;39m"
-DEFIMG=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
 WIDTHW=$(stty size | sed 's/.* //g')
+DIRNAME="temp_$RANDOM"
+
+function CTXT {
+     [[ $# -eq 0 ]] && return 1
+     declare -i str_len="${#1}"
+     [[ $str_len -ge $WIDTHW ]] && {
+          echo "$1";
+          return 0;
+     }
+
+     declare -i filler_len="$(( (WIDTHW - str_len) / 2 ))"
+     [[ $# -ge 2 ]] && ch="${2:0:1}" || ch=" "
+     local filler=""
+     for (( i = 0; i < filler_len; i++ )); do
+          filler="${filler}${ch}"
+     done
+
+     printf "%s%s%s" "$filler" "$1" "$filler"
+     [[ $(( (WIDTHW - str_len) % 2 )) -ne 0 ]] && printf "%s" "${ch}"
+     printf "\n"
+
+     return 0
+}
+
+function VBNL () {
+	if [ "$verbose" = true ]; then
+		if [ $# -eq 0 ]; then
+			echo -ne "${CYAN}"
+			CTXT "·" "·"
+			echo -ne "${NORMAL}"
+		elif [ "$1" = true ]; then
+			CTXT "—" "—"
+		fi
+	elif [ $# -gt 0 ] && [ "$verbose" = false ]; then
+		echo
+	fi
+}
 
 function WARN () {
 	if [ "$verbose" = true ]; then
@@ -65,11 +103,22 @@ function INFO () {
 	fi
 }
 
+function USER () {
+	if [ "$verbose" = true ]; then
+		echo -n -e "${PURPLE}[ USER ]${NORMAL} $1"
+	else
+		echo -n -e "$1"
+	fi
+}
+
 function ENDP () {
 	if [ "$verbose" = true ]; then
-		echo -ne "${RED}[ KILL ]${NORMAL} "
-		read -n 1 -s -r -p "Script Terminated."
+		echo -e "${RED}[ KILL ]${NORMAL} Script Terminated."
 	fi
+	VBNL true
+	read -n 1 -s -r -p "Press any key to continue…"
+	echo -ne "\r\033[K"
+	rm -rf ../$DIRNAME
 	exit
 }
 
@@ -86,10 +135,6 @@ function SUCC () {
 	if [ "$verbose" = true ]; then
 		echo -e "${GREEN}[ SUCC ]${NORMAL} $1"
 	fi
-}
-
-function CTXT () {
-	echo -e "$1" | sed -e :a -e "s/^.\{1,$WIDTHW\}$/ & /;ta" | tr -d '\n' | head -c $WIDTHW
 }
 
 function checkchoicetwo () {
@@ -165,6 +210,12 @@ function init-all () {
 		embedcover=true
 	fi
 	
+	checkchoicetwo $smartcrop "true" "false"
+	if [ $? -eq 0 ]; then
+		WARN "Invalid choice of smart crop detected."
+		smartcrop=true
+	fi
+	
 	checkchoicetwo $embedsubs "true" "false"
 	if [ $? -eq 0 ]; then
 		WARN "Invalid choice of embed subtitles detected."
@@ -183,11 +234,6 @@ function init-all () {
 		showlogo=true
 	fi
 	
-	if [ -z "$(echo $thumblink|egrep -o 'https?://[^ ]+')" ]; then
-		WARN "Invalid or no default thumbnail link detected."
-		unset thumblink
-	fi
-	
 	case $attempt in
 		''|*[!0-9]*)
 			WARN "Invalid value for attempt detected."
@@ -201,27 +247,49 @@ function init-all () {
 		;;
 	esac
 	SUCC "Initialization completed."
+	
+	if [ "$verbose" = true ]; then
+		CTXT "—" "—"
+	fi
 }
 
 function logo () {
 	if [ "$showlogo" = true ] && [ "$verbose" = false ]; then
+		echo -ne "\033]0;av-dl - A simple audio/video downloader\a"
 		echo -ne "${RED}"
-		CTXT "                     _ _ "
-		CTXT "                    | | |"
-		CTXT "  __ ___   ______ __| | |"
-		CTXT " / _\ \ \ / /____/ _\ | |"
-		CTXT "| (_| |\ V /    | (_| | |"
-		CTXT " \__,_| \_/      \__,_|_|"
-		echo -e " "
+		if [ $WIDTHW -ge 70 ]; then
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⢤⣤⣤⣄⠀⠀⠀ ⠀ ⠀⠀⠀⠀⠀⠀                                    " " "
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣶⣧⣐⠍⢙⣀⣼⣿⣿⣅⣤⣀⠀⠀⠀ ⠀⠀⠀                                     " " "
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠉⠙⠻⣿⣿⣿⣿⣿⣯⢆⣠⠀⠀⠀⠀⠀                                      " " "
+			CTXT "⠀⠀⠀⠠⣶⠆⠀⢀⣺⡃⣀⠀⠀⠀⠈⢿⣿⣿⣿⣿⡿⠏⠉⠀ ⠀⠀                                      " " "
+			CTXT "⠀⠀⣸⣷⣼⠆⠀⡌⢹⣿⣿⠀⢄⠀⠀⠈⣿⣿⣿⣿⡉⠉⠁⠀ ⠀⠀⠀                                     " " "
+			CTXT "⠀⢀⣿⣿⣿⠀⠸⣷⣿⣿⣿⣆⣠⣿⡄⠀⣼⣿⣿⣿⢆⣠⠀⠀⠀  ⠀                                     " " "
+			CTXT "⠀⢸⣿⣿⣿⠂⠀⠹⡿⣿⣿⣿⣿⣿⠀⠀⠟⠈⠏⠀⠀.⠀⠀ ⠀⠀⠀              •                      " " "
+			CTXT "⠀⣿⣿⣿⠏⢰⣿⣦⡀⠚⠛⢿⣿⡿⠀⠀⢸⠇⢀⠀⠀⠀⠀▪⠀⠀• ⣀   ▪· ⣤▄▄·  ▌ ▐·    ⣀   ·▄▄▄▄  ▄▄▌   " " "
+			CTXT "⢠⢿⣿⣿⠀⢾⣿⣿⡇⢻⡏⠀⠀⠀⠀⠀⡆⢰⣿⣿⡗⢠⣿⣿⣷⣤⣀▪ ⣀·   ⢸█ ▀█ ▪█·█▌        ██▪ ██ ██•   " " "
+			CTXT "⠀⠀⠈⠙⠒⠿⠿⣿⣿⠸⠇⠀⠀⠀⠀⠀⣷⠘⣿⠟⣠⣿⣿⣿⣷⢆⣠ ▪·⠀•  ⣼█▀▀█ ▐█▐█•  ▄██·  ▐█· ▐█▌██▪   " " "
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⣿⠀⣃⣾⣿⣿⣿⠏⠉•⠀·• ⠉ ⣀·⢸█ ▪▐▌ ███         ██. ██ ▐█▌▐▌ " " " 
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀•⠀ ▀  ▀ . ▀     ⠉    ▀▀▀▀▀• .▀▀▀  " " "
+		else
+			CTXT "                     _ _ " " "
+			CTXT "                    | | |" " "
+			CTXT "  __ ___   ______ __| | |" " "
+			CTXT " / _\ \ \ / /____/ _\ | |" " "
+			CTXT "| (_| |\ V /    | (_| | |" " "
+			CTXT " \__,_| \_/      \__,_|_|" " "
+		fi
+		echo
+		echo -ne "${YELLOW}"
+		CTXT "A simple audio/video downloader." " "
 		echo -ne "${NORMAL}"
-		CTXT "A simple audio/video downloader."
-		printf '%.s─' $(seq 1 $(stty size | sed 's/.* //g'))
+		CTXT "—" "—"
 	else
-		printf '%.s─' $(seq 1 $(stty size | sed 's/.* //g'))
+		CTXT "—" "—"
+		echo -ne "\033]0;av-dl - A simple audio/video downloader\a"
 		echo -ne "${RED}"
-		CTXT "av-dl - A simple audio/video downloader."
+		CTXT "av-dl - A simple audio/video downloader." " "
 		echo -ne "${NORMAL}"
-		printf '%.s─' $(seq 1 $(stty size | sed 's/.* //g'))
+		CTXT "—" "—"
 	fi
 }
 
@@ -232,7 +300,6 @@ function getTitle () {
 		WARN "Title fetch failed."
 		return 0
 	else
-		title=$(echo "$title"|tr -d "'\`\:\"\\\/\|")
 		SUCC "Title fetch successful."
 		return 1
 	fi
@@ -240,8 +307,10 @@ function getTitle () {
 
 function getAudio () {
 	INFO "Fetching audio of media."
-	yt-dlp --concurrent-fragments 8 -f 'bestaudio' --extract-audio --audio-format wav -o "temp_ytdl/audio.wav" $url
-	if [ -f 'temp_ytdl/audio.wav' ]; then
+	VBNL
+	yt-dlp --concurrent-fragments 8 -f 'bestaudio' --extract-audio --audio-format wav -o "./audio.wav" $url
+	VBNL
+	if [ -f './audio.wav' ]; then
 		SUCC "Audio fetch successful."
 		return 1
 	else
@@ -250,22 +319,12 @@ function getAudio () {
 	fi
 }
 
-function getCover () {
-	INFO "Fetching album cover."
-	curl $thumblink --create-dirs --output 'temp_ytdl/thumb_temp.tmp'
-	if [ -f temp_ytdl/thumb_temp.tmp ]; then
-		SUCC "Cover fetch successful."
-		return 1
-	else
-		WARN "Cover fetch failed."
-		return 0
-	fi
-}
-
 function getThumb () {
 	INFO "Fetching album cover."
-	yt-dlp --write-thumbnail --skip-download -o 'temp_ytdl/thumb_temp' $url
-	if [ -f temp_ytdl/thumb_temp.* ]; then
+	VBNL
+	yt-dlp --write-thumbnail --skip-download -o './thumb_temp' $url
+	VBNL
+	if [ -f ./thumb_temp.* ]; then
 		SUCC "Cover fetch successful."
 		return 1
 	else
@@ -275,58 +334,89 @@ function getThumb () {
 }
 
 function defThumb () {
-	mkdir -p temp_ytdl
-	if [ -z "$thumblink" ]; then
-		INFO "Writing embedded cover."
-		base64 -d <<< "$DEFIMG" > temp_ytdl/thumb_temp.png
+	INFO "Generating cover art."
+	VBNL
+	local xc=$((750 + RANDOM % 2501))
+	local yc=$((2000 + (RANDOM % 2 * 2 - 1) * $(awk -v xc="$xc" 'BEGIN {print int(sqrt(1250^2 - (xc - 2000)^2))}')))
+	local xd=$((4000 - xc))
+	local yd=$((4000 - yc))
+	local gradient="gradients=s=4000x4000:c0=0x33517e:c1=0x645098:c2=0xa53f97:c3=0xdf1177:c4=0xff033e:c5=0x2f4858:n=5:y0=$yc:x0=$xc:y1=$yd:x1=$xd:t=linear,format=rgba"
+	ffmpeg -y -hide_banner -loglevel warning -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -filter_complex "geq=r='32':g='41':b='47':a='255*(1-between(hypot(X-2000,Y-2000),0,1150))'" -frames:v 1 -update 1 './a.png'
+	ffmpeg -y -hide_banner -loglevel warning -stats -f lavfi -i $gradient -filter_complex "geq=g='g(X,Y)':a='255*between(hypot(X-2000,Y-2000),0,1200)'" -frames:v 1 -update 1 './b.png'
+	ffmpeg -y -hide_banner -loglevel warning -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -vf "geq=a='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':r='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':g='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':b='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))'" -frames:v 1 -update 1 './c.png'
+	ffmpeg -y -hide_banner -loglevel warning -stats -i './a.png' -i './b.png' -i './c.png' -filter_complex "[0][1]overlay[tmp1];[tmp1][2]overlay[tmp2];[tmp2]format=rgb24,scale=2000:2000:flags=spline,deband,scale=1000:1000:flags=lanczos" -frames:v 1 -update 1 './thumb_temp.png'
+	VBNL
+	if [ -f ./thumb_temp.png ]; then
+		SUCC "Cover generation successful."
+		return 1
 	else
-		loop "getCover" $attempt
-		if [ $? -eq 0 ]; then
-			WARN "Default cover fetch failed. Using embedded cover."
-			base64 -d <<< "$DEFIMG" > temp_ytdl/thumb_temp.png
-		fi
-	fi	
+		WARN "Cover generation failed."
+		return 0
+	fi
+
 }
 
-function trmThumb () {
-	INFO "Cropping cover."
-	mv temp_ytdl/thumb_temp.* temp_ytdl/thumb_raw
-	ffmpeg -hide_banner -loglevel error -i 'temp_ytdl/thumb_raw' -vf "crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -q:v 2 'temp_ytdl/thumb001.jpg' 
+function savThumb () {
+	local filepath=$(find "./" -type f -name "thumb_temp.*" | head -n 1)
+	if [[ -n "$filepath" ]]; then
+        INFO "Detected file extension as ${filepath##*.}."
+    else
+		ERRR "Cover art not detected."
+	fi
 	
-	cp temp_ytdl/thumb001.jpg temp_ytdl/thumb002.jpg
-	cp temp_ytdl/thumb001.jpg temp_ytdl/thumb003.jpg
-
-	crop=$(ffmpeg -i 'temp_ytdl/thumb%3d.jpg' -vf "cropdetect=32:1:0" -f null - 2>&1 | egrep -o "crop=[^ ]+")
-	ffmpeg -y -hide_banner -loglevel error -i 'temp_ytdl/thumb001.jpg' -vf "$crop,crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -q:v 2 'temp_ytdl/cover.jpg'
-}
-
-function jpgThumb () {
-	INFO "Converting cover to jpeg."
-	mv temp_ytdl/thumb_temp.* temp_ytdl/thumb_raw
-	ffmpeg -y -hide_banner -loglevel error -i 'temp_ytdl/thumb_raw' -q:v 2 'temp_ytdl/cover.jpg'
+	if [ "$autotrimthumb" = true ] && [ "$coverthumb" = true ]; then
+		INFO "Cropping cover."
+		VBNL
+		ffmpeg -y -hide_banner -loglevel warning -stats -i $filepath -vf "crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -frames:v 1 -update 1 './cover.png'
+		if [ "$smartcrop" = true ]; then
+			mv ./cover.png ./thumb001.png
+			cp ./thumb001.png ./thumb002.png
+			cp ./thumb001.png ./thumb003.png
+			local crop=$(ffmpeg -i './thumb%03d.png' -vf "cropdetect=14:1:0" -f null - 2>&1 | egrep -o "crop=[^ ]+")
+			ffmpeg -y -hide_banner -loglevel warning -stats -i './thumb001.png' -vf "$crop,crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -frames:v 1 -update 1 './cover.png'
+		fi
+		VBNL
+		if [ -f ./cover.png ]; then
+			SUCC "Cover crop successful."
+			return 1
+		else
+			WARN "Cover crop failed."
+			return 0
+		fi
+	elif [ "${filepath##*.}" != "png" ]; then
+		INFO "Converting cover to png."
+		VBNL
+		ffmpeg -y -hide_banner -loglevel warning -stats -i $filepath -frames:v 1 -update 1 './cover.png'
+		VBNL
+		if [ -f ./cover.png ]; then
+			SUCC "Cover conversion successful."
+			return 1
+		else
+			WARN "Cover conversion failed."
+			return 0
+		fi
+	elif [ "${filepath##*.}" == "png" ]; then
+		INFO "File extension already png, skipping conversion."
+		mv ./thumb_temp.png ./cover.png
+	else
+		ERRR "Unknown error occured while processing coverart."
+	fi
 }
 
 # -----------------------------------------------------------------------------------------------
 
-init-all $*
 logo
+init-all $*
 
 if [ -z "$1" ]; then
-	if [ "$verbose" = true ]; then
-		echo -n -e "${BLUE}[ INFO ]${NORMAL} URL:"
-	else
-		echo -n -e "URL: "
-	fi
+	USER "${GREEN}URL:${NORMAL} "
 	read url
 	if [ -z "$(echo $url|egrep -o 'https?://[^ ]+')" ]; then
 		ERRR "Invalid URL. Make sure to include the https:// part too."
 	fi
 else
-	if [ "$verbose" = true ]; then
-		echo -e "${BLUE}[ INFO ]${NORMAL} URL: $url"
-	else
-		echo -e "URL: $url"
-	fi
+	USER "${GREEN}URL:${NORMAL} $url"
+	echo
 fi
 
 loop "getTitle" $attempt
@@ -336,23 +426,26 @@ if [ $? -eq 0 ]; then
 	title=$(echo $url|sed 's/^.*v=//')
 fi
 
-title=$(echo "$title"|tr -d "'\`\"\\\/\|")
-if [ "$verbose" = true ]; then
-	echo -e "${BLUE}[ INFO ]${NORMAL} Title: $title"
-else
-	echo -e "Title: $title"
-	echo ''
-fi
+title=$(echo "$title"|tr -d "'\?\`\"\\\/\|")
+USER "${GREEN}Title:${NORMAL} $title"
+echo
+VBNL false
 
 if [ "$cho" == "n" ]; then
-	echo -n -e "Media type ${GREEN}(a)${NORMAL}udio or ${GREEN}(v)${NORMAL}ideo: "
-	read cho
-	echo ''
+	USER "Media type ${GREEN}(a)${NORMAL}udio or ${GREEN}(v)${NORMAL}ideo: "
+	read -n1 cho
+	echo
+	VBNL true
 fi
 
 case $cho in
-	a | A | audio | Audio | AUDIO | 1)
-		cd "$music"
+	a | A | 1)
+		USER "User choice detected as ${GREEN}(a)${NORMAL}udio."
+		echo
+		INFO "Creating temporary folder ${GREEN}$DIRNAME${NORMAL}"
+		mkdir -p "$music/$DIRNAME"
+		cd "$music/$DIRNAME"
+		
 		loop "getAudio" $attempt
 		
 		if [ $? -eq 0 ]; then
@@ -363,46 +456,61 @@ case $cho in
 			if [ "$coverthumb" = true ]; then
 				loop "getThumb" $attempt
 				if [ $? -eq 0 ]; then
-					WARN "Thumbnail fetch failed. Using default cover."
+					WARN "Thumbnail fetch failed."
 					defThumb
 				fi
 			else
 				defThumb
 			fi
-			if [ "$autotrimthumb" = true ]; then
-				trmThumb
-			else
-				jpgThumb
-			fi
+			savThumb
 			INFO "Writing audio file."
-			ffmpeg -hide_banner -loglevel error -stats -i 'temp_ytdl/audio.wav' -i 'temp_ytdl/cover.jpg' -map 0:0 -map 1:0 -acodec libmp3lame -q:a 0 -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "$title.mp3"
+			VBNL
+			ffmpeg -y -hide_banner -loglevel warning -stats -i './audio.wav' -i './cover.png' -map 0:0 -map 1:0 -acodec libmp3lame -q:a 0 -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "$title.mp3"
+			VBNL
 		else
 			INFO "Writing audio file."
-			ffmpeg -hide_banner -loglevel error -stats -i 'temp_ytdl/audio.wav' -acodec libmp3lame -q:a 0 "$title.mp3"
+			VBNL
+			ffmpeg -y -hide_banner -loglevel warning -stats -i './audio.wav' -acodec libmp3lame -q:a 0 "$title.mp3"
+			VBNL
 		fi
-		INFO "Deleting temporary files."
-		rm -rf temp_ytdl
+		mv -f ./*.mp3 ..
+		SUCC "Successfully downloaded audio file ${GREEN}$title.mp3${NORMAL}."
 	;;
 
-	v | V | video | Video | VIDEO | 2)
-		cd "$video"
+	v | V | 2)
+		USER "User choice detected as ${GREEN}(v)${NORMAL}ideo."
+		echo
+		INFO "Creating temporary folder ${GREEN}$DIRNAME${NORMAL}"
+		
+		mkdir -p "$video/$DIRNAME"
+		cd "$video/$DIRNAME"
+		
 		if [ "$embedsubs" = true ]; then
 			if [ "$autosubs" = true ]; then
 				INFO "Writing video file."
-				yt-dlp --concurrent-fragments 8 -f 'bestvideo+bestaudio/best' --merge-output-format mkv --write-sub --write-auto-sub --sub-lang en --embed-subs -o "$title.%(ext)s" $url
+				VBNL
+				yt-dlp --concurrent-fragments 8 -f 'bestvideo*+bestaudio/best' --embed-chapters --sponsorblock-mark "sponsor,preview,filler,music_offtopic" --merge-output-format mkv --write-sub --write-auto-sub --sub-langs en.*  --sub-format "ass/srt/best" --convert-subs srt --embed-subs --embed-metadata -o "./$title.%(ext)s" $url
+				VBNL
 			else
 				INFO "Writing video file."
-				yt-dlp --concurrent-fragments 8 -f 'bestvideo+bestaudio/best' --merge-output-format mkv --write-sub --sub-lang en --embed-subs -o "$title.%(ext)s" $url
+				VBNL
+				yt-dlp --concurrent-fragments 8 -f 'bestvideo*+bestaudio/best' --embed-chapters --sponsorblock-mark "sponsor,preview,filler,music_offtopic"  --merge-output-format mkv --write-sub --sub-lang en.* --sub-format "ass/srt/best" --convert-subs srt --embed-subs --embed-metadata -o "./$title.%(ext)s" $url
+				VBNL
 			fi
 		else
 			INFO "Writing video file."
-			yt-dlp --concurrent-fragments 8 -f 'bestvideo+bestaudio/best' --merge-output-format mkv -o "$title.%(ext)s" $url
+			VBNL
+			yt-dlp --concurrent-fragments 8 -f 'bestvideo*+bestaudio/best' --embed-chapters --sponsorblock-mark "sponsor,preview,filler,music_offtopic"  --merge-output-format mkv -o "./$title.%(ext)s" $url
+			VBNL
 		fi
+		mv -f ./*.mkv ..
+		SUCC "Successfully downloaded video file ${GREEN}$title.mkv${NORMAL}."
 	;;
 	
 	*)
-		cd "$video"
-		WARN "Invalid choice. Using generic settings."
-		yt-dlp --concurrent-fragments 8 -f 'bestvideo+bestaudio/best' --merge-output-format mkv -o "$title.%(ext)s" $url
+		WARN "No known action for user input: ${RED}$cho${NORMAL}."
+		ENDP "Invalid choice."
 	;;
 esac
+
+ENDP
