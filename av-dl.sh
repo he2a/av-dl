@@ -44,7 +44,7 @@ showlogo=true
 fastout=false
 
 # Set true to enable verbose mode mainly for debugging the script.
-verbose=false
+verbose=true
 
 # ----------------------------------------------------------------------------
 
@@ -395,9 +395,9 @@ function defThumb () {
 	local yd=$((4000 - yc))
 	local gradient="gradients=s=4000x4000:c0=0x33517e:c1=0x645098:c2=0xa53f97:c3=0xdf1177:c4=0xff033e:c5=0x2f4858:n=5:y0=$yc:x0=$xc:y1=$yd:x1=$xd:t=linear,format=rgba"
 	ffmpeg -y -hide_banner -loglevel $loglevel -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -filter_complex "geq=r='32':g='41':b='47':a='255*(1-between(hypot(X-2000,Y-2000),0,1150))'" -frames:v 1 -update 1 './a.png'
-	ffmpeg -y -hide_banner -loglevel $loglevel -stats -f lavfi -i $gradient -filter_complex "geq=g='g(X,Y)':a='255*between(hypot(X-2000,Y-2000),0,1200)'" -frames:v 1 -update 1 './b.png'
+	ffmpeg -y -hide_banner -loglevel $loglevel -stats -f lavfi -i $gradient -filter_complex "geq=g='g(X,Y)':a='255*between(hypot(X-2000,Y-2000),0,1200)',deband,noise=c0s=6:c0f=u" -frames:v 1 -update 1 './b.png'
 	ffmpeg -y -hide_banner -loglevel $loglevel -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -vf "geq=a='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':r='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':g='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':b='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))'" -frames:v 1 -update 1 './c.png'
-	ffmpeg -y -hide_banner -loglevel $loglevel -stats -i './a.png' -i './b.png' -i './c.png' -filter_complex "[0][1]overlay[tmp1];[tmp1][2]overlay[tmp2];[tmp2]format=rgb24,scale=2000:2000:flags=spline,deband,scale=1000:1000:flags=lanczos" -frames:v 1 -update 1 './thumb_temp.png'
+	ffmpeg -y -hide_banner -loglevel $loglevel -stats -i './a.png' -i './b.png' -i './c.png' -filter_complex "[0][1]overlay=format=auto,format=rgba[tmp];[tmp][2]overlay=format=auto,format=rgba,scale=1000:1000:flags=lanczos,format=rgb24" -frames:v 1 -update 1 './thumb_temp.png'
 	VBNL
 	if [ -f ./thumb_temp.png ]; then
 		SUCC "Cover generation successful."
