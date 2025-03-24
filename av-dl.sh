@@ -40,6 +40,9 @@ autosubs=true
 # Set false to show a text instead of logo.
 showlogo=true
 
+# Set true to speed up output but without fancy logo.
+fastout=false
+
 # Set true to enable verbose mode mainly for debugging the script.
 verbose=false
 
@@ -56,37 +59,57 @@ WIDTHW=$(stty size | sed 's/.* //g')
 DIRNAME="temp_$RANDOM"
 
 function CTXT {
-     [[ $# -eq 0 ]] && return 1
-     declare -i str_len="${#1}"
-     [[ $str_len -ge $WIDTHW ]] && {
-          echo "$1";
-          return 0;
-     }
+	if [ $# -eq 0 ]; then
+		return 1
+	else
+		if [ "$fastout" = false ]; then
+			local text=$(echo -e "$1" | sed 's/\x1B\[[0-9;]\{1,\}[A-Za-z]//g')
+		else
+			local text=$1
+		fi
+		local str_len="${#text}"
+		if [ $str_len -ge $WIDTHW ]; then
+			echo -e "$1"
+			return 0
+		elif [ $# -eq 1 ]; then
+			local ch=" "
+		else
+			local ch="${2:0:1}"
+		fi
+	fi
 
-     declare -i filler_len="$(( (WIDTHW - str_len) / 2 ))"
-     [[ $# -ge 2 ]] && ch="${2:0:1}" || ch=" "
-     local filler=""
-     for (( i = 0; i < filler_len; i++ )); do
-          filler="${filler}${ch}"
-     done
+	local filler_len="$(( (WIDTHW - str_len) / 2 ))"
+	local filler_odd="$(( (WIDTHW - str_len) % 2 ))"
+    local filler=""
+	for (( i = 0; i < filler_len; i++ )); do
+		filler="${filler}${ch}"
+	done
+	if [ $filler_odd -eq 0 ]; then
+		echo -e "$filler$1$filler"
+	else
+		echo -e "$filler$ch$1$filler"
+	fi
+    return 0
+}
 
-     printf "%s%s%s" "$filler" "$1" "$filler"
-     [[ $(( (WIDTHW - str_len) % 2 )) -ne 0 ]] && printf "%s" "${ch}"
-     printf "\n"
-
-     return 0
+function CLLN () {
+	if [ "$verbose" = false ] || [ "$1" = true ]; then
+		echo -ne "\r\033[K"
+	else
+		echo
+	fi
 }
 
 function VBNL () {
 	if [ "$verbose" = true ]; then
-		if [ $# -eq 0 ]; then
+		if [ $# -eq 0 ] || [ "$1" = false ] ; then
 			echo -ne "${CYAN}"
 			CTXT "·" "·"
 			echo -ne "${NORMAL}"
 		elif [ "$1" = true ]; then
 			CTXT "—" "—"
 		fi
-	elif [ $# -gt 0 ] && [ "$verbose" = false ]; then
+	elif [ "$1" = false ] && [ "$verbose" = false ]; then
 		echo
 	fi
 }
@@ -114,11 +137,12 @@ function USER () {
 function ENDP () {
 	if [ "$verbose" = true ]; then
 		echo -e "${RED}[ KILL ]${NORMAL} Script Terminated."
+		echo -n -e "${BLUE}[ INFO ]${NORMAL} Press any key to continue…"
+		read -n 1 -s -r
+		CLLN true
 	fi
-	VBNL true
-	read -n 1 -s -r -p "Press any key to continue…"
-	echo -ne "\r\033[K"
 	rm -rf ../$DIRNAME
+	CTXT "—" "—"
 	exit
 }
 
@@ -168,6 +192,9 @@ function init-all () {
 	if [ $? -eq 0 ]; then
 		verbose=false
 	fi
+
+	hash yt-dlp 2>/dev/null || ERRR "Dependency missing: yt-dlp not found."
+	hash ffmpeg 2>/dev/null || ERRR "Dependency missing: ffmpeg not found."
 
 	INFO "Initializing script."
 	
@@ -234,6 +261,17 @@ function init-all () {
 		showlogo=true
 	fi
 	
+	checkchoicetwo $fastout "true" "false"
+	if [ $? -eq 0 ]; then
+		WARN "Invalid choice of fast output detected."
+		fastout=false
+	fi
+	
+	if [ $WIDTHW -le 65 ] && [ "$fastout" = false ]; then
+		WARN "Screen width too low, switching to fast output."
+		fastout=true
+	fi
+	
 	case $attempt in
 		''|*[!0-9]*)
 			WARN "Invalid value for attempt detected."
@@ -246,48 +284,57 @@ function init-all () {
 			fi
 		;;
 	esac
-	SUCC "Initialization completed."
 	
 	if [ "$verbose" = true ]; then
-		CTXT "—" "—"
+		loglevel="info"
+	else
+		loglevel="fatal"
 	fi
+	
+	SUCC "Initialization completed."
+	VBNL true
 }
 
 function logo () {
 	if [ "$showlogo" = true ] && [ "$verbose" = false ]; then
 		echo -ne "\033]0;av-dl - A simple audio/video downloader\a"
-		echo -ne "${RED}"
-		if [ $WIDTHW -ge 70 ]; then
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⢤⣤⣤⣄⠀⠀⠀ ⠀ ⠀⠀⠀⠀⠀⠀                                    " " "
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣶⣧⣐⠍⢙⣀⣼⣿⣿⣅⣤⣀⠀⠀⠀ ⠀⠀⠀                                     " " "
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀⠉⠙⠻⣿⣿⣿⣿⣿⣯⢆⣠⠀⠀⠀⠀⠀                                      " " "
-			CTXT "⠀⠀⠀⠠⣶⠆⠀⢀⣺⡃⣀⠀⠀⠀⠈⢿⣿⣿⣿⣿⡿⠏⠉⠀ ⠀⠀                                      " " "
-			CTXT "⠀⠀⣸⣷⣼⠆⠀⡌⢹⣿⣿⠀⢄⠀⠀⠈⣿⣿⣿⣿⡉⠉⠁⠀ ⠀⠀⠀                                     " " "
-			CTXT "⠀⢀⣿⣿⣿⠀⠸⣷⣿⣿⣿⣆⣠⣿⡄⠀⣼⣿⣿⣿⢆⣠⠀⠀⠀  ⠀                                     " " "
-			CTXT "⠀⢸⣿⣿⣿⠂⠀⠹⡿⣿⣿⣿⣿⣿⠀⠀⠟⠈⠏⠀⠀.⠀⠀ ⠀⠀⠀              •                      " " "
-			CTXT "⠀⣿⣿⣿⠏⢰⣿⣦⡀⠚⠛⢿⣿⡿⠀⠀⢸⠇⢀⠀⠀⠀⠀▪⠀⠀• ⣀   ▪· ⣤▄▄·  ▌ ▐·    ⣀   ·▄▄▄▄  ▄▄▌   " " "
-			CTXT "⢠⢿⣿⣿⠀⢾⣿⣿⡇⢻⡏⠀⠀⠀⠀⠀⡆⢰⣿⣿⡗⢠⣿⣿⣷⣤⣀▪ ⣀·   ⢸█ ▀█ ▪█·█▌        ██▪ ██ ██•   " " "
-			CTXT "⠀⠀⠈⠙⠒⠿⠿⣿⣿⠸⠇⠀⠀⠀⠀⠀⣷⠘⣿⠟⣠⣿⣿⣿⣷⢆⣠ ▪·⠀•  ⣼█▀▀█ ▐█▐█•  ▄██·  ▐█· ▐█▌██▪   " " "
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⣿⠀⣃⣾⣿⣿⣿⠏⠉•⠀·• ⠉ ⣀·⢸█ ▪▐▌ ███         ██. ██ ▐█▌▐▌ " " " 
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀•⠀ ▀  ▀ . ▀     ⠉    ▀▀▀▀▀• .▀▀▀  " " "
+		CTXT "—" "—"
+		if [ "$fastout" = false ]; then
+			CTXT "${PURPLE}⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⢤⣤⣤⣄⠀⠀⠀ ⠀ ⠀⠀⠀⠀⠀⠀                                    "
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣶⣧⣐⠍⢙⣀⣼⣿⣿⣅⣤⣀⠀⠀⠀ ⠀⠀⠀                                     "
+			CTXT "${NORMAL}⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀${PURPLE}⠉⠙⠻⣿⣿⣿⣿⣿⣯⢆⣠⠀⠀⠀⠀⠀                                      "
+			CTXT "${NORMAL}⠀⠀⠀⠠⣶⠆⠀⢀⣺⡃⣀⠀⠀⠀${PURPLE}⠈⢿⣿⣿⣿⣿⡿⠏⠉⠀ ⠀⠀                                      "
+			CTXT "⠀⠀⣸⣷⣼⠆⠀${NORMAL}⡌⢹⣿⣿⠀⢄⠀⠀${PURPLE}⠈⣿⣿⣿⣿⡉⠉⠁⠀ ⠀⠀⠀                                     "
+			CTXT "⠀⢀⣿⣿⣿⠀${NORMAL}⠸⣷⣿⣿⣿⣆⣠⣿⡄⠀${PURPLE}⣼⣿⣿⣿⢆⣠⠀⠀⠀  ⠀                                     "
+			CTXT "⠀⢸⣿⣿⣿⠂⠀${NORMAL}⠹⡿⣿⣿⣿⣿⣿⠀⠀${PURPLE}⠟⠈⠏⠀⠀.⠀⠀ ⠀⠀⠀              •                      "
+			CTXT "⠀⣿⣿⣿⠏⢰⣿⣦⡀${NORMAL}⠚⠛⢿⣿⡿⠀⠀${PURPLE}⢸⠇⢀⠀⠀⠀⠀▪⠀⠀• ⣀   ▪·⣤${RED}▄▄${PURPLE}·${RED}  ▌ ▐${PURPLE}·    ⣀   ·${RED}▄▄▄▄  ▄▄▌   ${PURPLE}"
+			CTXT "⢠⢿⣿⣿⠀⢾⣿⣿⡇⢻⡏⠀⠀⠀⠀⠀⡆⢰⣿⣿⡗⢠⣿⣿⣷⣤⣀▪ ⣀·   ⢸${RED}█ ▀█ ${PURPLE}·${RED}█${PURPLE}·${RED}█▌        ██${PURPLE}·${RED} ██ ██${PURPLE}·${RED}   ${PURPLE}"
+			CTXT "⠀⠀⠈⠙⠒⠿⠿⣿⣿⠸⠇⠀⠀⠀⠀⠀⣷⠘⣿⠟⣠⣿⣿⣿⣷⢆⣠ ▪·⠀•  ⣼${RED}█▀▀█ ▐█▐█${PURPLE}·${RED}  ▄██${PURPLE}·${RED}  ▐█${PURPLE}·${RED} ▐█▌██${PURPLE}·${RED}   ${PURPLE}"
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⣿⠀⣃⣾⣿⣿⣿⠏⠉•⠀·• ⠉ ⣀·⢸${RED}█ ${PURPLE}·${RED}▐▌ ███         ██${PURPLE}·${RED} ██ ▐█▌▐▌ ${PURPLE}"
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀•⠀ ${RED}▀  ▀ ${PURPLE}·${RED} ▀     ${PURPLE}·${RED}    ▀▀▀▀▀${PURPLE}·${RED} ${PURPLE}·${RED}▀▀▀  "
+			echo -e "${NORMAL}"
+			CTXT "A simple ${GREEN}(a)${NORMAL}udio/${GREEN}(v)${NORMAL}ideo downloader."
+			fastout=true
 		else
-			CTXT "                     _ _ " " "
-			CTXT "                    | | |" " "
-			CTXT "  __ ___   ______ __| | |" " "
-			CTXT " / _\ \ \ / /____/ _\ | |" " "
-			CTXT "| (_| |\ V /    | (_| | |" " "
-			CTXT " \__,_| \_/      \__,_|_|" " "
+			echo -ne "${RED}"
+			CTXT "                     _ _ "
+			CTXT "                    | | |"
+			CTXT "  __ ___   ______ __| | |"
+			CTXT " / _\ \ \ / /____/ _\ | |"
+			CTXT "| (_| |\ V /    | (_| | |"
+			CTXT " \__,_| \_/      \__,_|_|"
+			echo
+			echo -ne "${YELLOW}"
+			CTXT "A simple audio/video downloader."
+			echo -ne "${NORMAL}"
 		fi
-		echo
-		echo -ne "${YELLOW}"
-		CTXT "A simple audio/video downloader." " "
-		echo -ne "${NORMAL}"
 		CTXT "—" "—"
 	else
+		fastout=true
 		CTXT "—" "—"
 		echo -ne "\033]0;av-dl - A simple audio/video downloader\a"
 		echo -ne "${RED}"
-		CTXT "av-dl - A simple audio/video downloader." " "
+		CTXT "av-dl - A simple audio/video downloader."
 		echo -ne "${NORMAL}"
 		CTXT "—" "—"
 	fi
@@ -307,7 +354,7 @@ function getTitle () {
 
 function getAudio () {
 	INFO "Fetching audio of media."
-	VBNL
+	VBNL false
 	yt-dlp --concurrent-fragments 8 -f 'bestaudio' --extract-audio --audio-format wav -o "./audio.wav" $url
 	VBNL
 	if [ -f './audio.wav' ]; then
@@ -321,7 +368,7 @@ function getAudio () {
 
 function getThumb () {
 	INFO "Fetching album cover."
-	VBNL
+	VBNL false
 	yt-dlp --write-thumbnail --skip-download -o './thumb_temp' $url
 	VBNL
 	if [ -f ./thumb_temp.* ]; then
@@ -335,16 +382,16 @@ function getThumb () {
 
 function defThumb () {
 	INFO "Generating cover art."
-	VBNL
+	VBNL false
 	local xc=$((750 + RANDOM % 2501))
 	local yc=$((2000 + (RANDOM % 2 * 2 - 1) * $(awk -v xc="$xc" 'BEGIN {print int(sqrt(1250^2 - (xc - 2000)^2))}')))
 	local xd=$((4000 - xc))
 	local yd=$((4000 - yc))
 	local gradient="gradients=s=4000x4000:c0=0x33517e:c1=0x645098:c2=0xa53f97:c3=0xdf1177:c4=0xff033e:c5=0x2f4858:n=5:y0=$yc:x0=$xc:y1=$yd:x1=$xd:t=linear,format=rgba"
-	ffmpeg -y -hide_banner -loglevel warning -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -filter_complex "geq=r='32':g='41':b='47':a='255*(1-between(hypot(X-2000,Y-2000),0,1150))'" -frames:v 1 -update 1 './a.png'
-	ffmpeg -y -hide_banner -loglevel warning -stats -f lavfi -i $gradient -filter_complex "geq=g='g(X,Y)':a='255*between(hypot(X-2000,Y-2000),0,1200)'" -frames:v 1 -update 1 './b.png'
-	ffmpeg -y -hide_banner -loglevel warning -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -vf "geq=a='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':r='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':g='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':b='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))'" -frames:v 1 -update 1 './c.png'
-	ffmpeg -y -hide_banner -loglevel warning -stats -i './a.png' -i './b.png' -i './c.png' -filter_complex "[0][1]overlay[tmp1];[tmp1][2]overlay[tmp2];[tmp2]format=rgb24,scale=2000:2000:flags=spline,deband,scale=1000:1000:flags=lanczos" -frames:v 1 -update 1 './thumb_temp.png'
+	ffmpeg -y -hide_banner -loglevel $loglevel -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -filter_complex "geq=r='32':g='41':b='47':a='255*(1-between(hypot(X-2000,Y-2000),0,1150))'" -frames:v 1 -update 1 './a.png'
+	ffmpeg -y -hide_banner -loglevel $loglevel -stats -f lavfi -i $gradient -filter_complex "geq=g='g(X,Y)':a='255*between(hypot(X-2000,Y-2000),0,1200)'" -frames:v 1 -update 1 './b.png'
+	ffmpeg -y -hide_banner -loglevel $loglevel -stats -f lavfi -i "color=c=0x20292FFF:s=4000x4000,format=rgba" -vf "geq=a='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':r='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':g='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))':b='255*max(lte((X-2000+(530/3)+25)+sqrt(3)*abs(Y-2000),530)*gte(X-2000+(530/3)+25,0),between(hypot(X-2000,Y-2000),570,630))'" -frames:v 1 -update 1 './c.png'
+	ffmpeg -y -hide_banner -loglevel $loglevel -stats -i './a.png' -i './b.png' -i './c.png' -filter_complex "[0][1]overlay[tmp1];[tmp1][2]overlay[tmp2];[tmp2]format=rgb24,scale=2000:2000:flags=spline,deband,scale=1000:1000:flags=lanczos" -frames:v 1 -update 1 './thumb_temp.png'
 	VBNL
 	if [ -f ./thumb_temp.png ]; then
 		SUCC "Cover generation successful."
@@ -366,14 +413,14 @@ function savThumb () {
 	
 	if [ "$autotrimthumb" = true ] && [ "$coverthumb" = true ]; then
 		INFO "Cropping cover."
-		VBNL
-		ffmpeg -y -hide_banner -loglevel warning -stats -i $filepath -vf "crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -frames:v 1 -update 1 './cover.png'
+		VBNL false
+		ffmpeg -y -hide_banner -loglevel $loglevel -stats -i $filepath -vf "crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -frames:v 1 -update 1 './cover.png'
 		if [ "$smartcrop" = true ]; then
 			mv ./cover.png ./thumb001.png
 			cp ./thumb001.png ./thumb002.png
 			cp ./thumb001.png ./thumb003.png
 			local crop=$(ffmpeg -i './thumb%03d.png' -vf "cropdetect=14:1:0" -f null - 2>&1 | egrep -o "crop=[^ ]+")
-			ffmpeg -y -hide_banner -loglevel warning -stats -i './thumb001.png' -vf "$crop,crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -frames:v 1 -update 1 './cover.png'
+			ffmpeg -y -hide_banner -loglevel $loglevel -stats -i './thumb001.png' -vf "$crop,crop=w='min(iw\,ih)':h='min(iw\,ih)',setsar=1" -frames:v 1 -update 1 './cover.png'
 		fi
 		VBNL
 		if [ -f ./cover.png ]; then
@@ -385,8 +432,8 @@ function savThumb () {
 		fi
 	elif [ "${filepath##*.}" != "png" ]; then
 		INFO "Converting cover to png."
-		VBNL
-		ffmpeg -y -hide_banner -loglevel warning -stats -i $filepath -frames:v 1 -update 1 './cover.png'
+		VBNL false
+		ffmpeg -y -hide_banner -loglevel $loglevel -stats -i $filepath -frames:v 1 -update 1 './cover.png'
 		VBNL
 		if [ -f ./cover.png ]; then
 			SUCC "Cover conversion successful."
@@ -405,8 +452,13 @@ function savThumb () {
 
 # -----------------------------------------------------------------------------------------------
 
-logo
-init-all $*
+if [ "$verbose" = true ]; then
+	logo
+	init-all $*
+else
+	init-all $*
+	logo
+fi
 
 if [ -z "$1" ]; then
 	USER "${GREEN}URL:${NORMAL} "
@@ -425,16 +477,15 @@ if [ $? -eq 0 ]; then
 	WARN "Title fetch failed. Using media ID from URL."
 	title=$(echo $url|sed 's/^.*v=//')
 fi
-
 title=$(echo "$title"|tr -d "'\?\`\"\\\/\|")
+
 USER "${GREEN}Title:${NORMAL} $title"
 echo
-VBNL false
 
 if [ "$cho" == "n" ]; then
 	USER "Media type ${GREEN}(a)${NORMAL}udio or ${GREEN}(v)${NORMAL}ideo: "
 	read -n1 cho
-	echo
+	CLLN
 	VBNL true
 fi
 
@@ -464,17 +515,18 @@ case $cho in
 			fi
 			savThumb
 			INFO "Writing audio file."
-			VBNL
-			ffmpeg -y -hide_banner -loglevel warning -stats -i './audio.wav' -i './cover.png' -map 0:0 -map 1:0 -acodec libmp3lame -q:a 0 -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "$title.mp3"
-			VBNL
+			VBNL false
+			ffmpeg -y -hide_banner -loglevel $loglevel -stats -i './audio.wav' -i './cover.png' -map 0:0 -map 1:0 -acodec libmp3lame -q:a 0 -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" "$title.mp3"
+			VBNL false
 		else
 			INFO "Writing audio file."
-			VBNL
-			ffmpeg -y -hide_banner -loglevel warning -stats -i './audio.wav' -acodec libmp3lame -q:a 0 "$title.mp3"
-			VBNL
+			VBNL false
+			ffmpeg -y -hide_banner -loglevel $loglevel -stats -i './audio.wav' -acodec libmp3lame -q:a 0 "$title.mp3"
+			VBNL false
 		fi
 		mv -f ./*.mp3 ..
-		SUCC "Successfully downloaded audio file ${GREEN}$title.mp3${NORMAL}."
+		USER "Successfully downloaded audio file ${GREEN}$title.mp3${NORMAL}."
+		echo
 	;;
 
 	v | V | 2)
@@ -488,23 +540,24 @@ case $cho in
 		if [ "$embedsubs" = true ]; then
 			if [ "$autosubs" = true ]; then
 				INFO "Writing video file."
-				VBNL
+				VBNL false
 				yt-dlp --concurrent-fragments 8 -f 'bestvideo*+bestaudio/best' --embed-chapters --sponsorblock-mark "sponsor,preview,filler,music_offtopic" --merge-output-format mkv --write-sub --write-auto-sub --sub-langs en.*  --sub-format "ass/srt/best" --convert-subs srt --embed-subs --embed-metadata -o "./$title.%(ext)s" $url
-				VBNL
+				VBNL false
 			else
 				INFO "Writing video file."
-				VBNL
+				VBNL false
 				yt-dlp --concurrent-fragments 8 -f 'bestvideo*+bestaudio/best' --embed-chapters --sponsorblock-mark "sponsor,preview,filler,music_offtopic"  --merge-output-format mkv --write-sub --sub-lang en.* --sub-format "ass/srt/best" --convert-subs srt --embed-subs --embed-metadata -o "./$title.%(ext)s" $url
-				VBNL
+				VBNL false
 			fi
 		else
 			INFO "Writing video file."
-			VBNL
+			VBNL false
 			yt-dlp --concurrent-fragments 8 -f 'bestvideo*+bestaudio/best' --embed-chapters --sponsorblock-mark "sponsor,preview,filler,music_offtopic"  --merge-output-format mkv -o "./$title.%(ext)s" $url
-			VBNL
+			VBNL false
 		fi
 		mv -f ./*.mkv ..
-		SUCC "Successfully downloaded video file ${GREEN}$title.mkv${NORMAL}."
+		USER "Successfully downloaded video file ${GREEN}$title.mkv${NORMAL}."
+		echo
 	;;
 	
 	*)
@@ -512,5 +565,4 @@ case $cho in
 		ENDP "Invalid choice."
 	;;
 esac
-
 ENDP
