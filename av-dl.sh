@@ -62,12 +62,18 @@ function CTXT {
 	if [ $# -eq 0 ]; then
 		return 1
 	else
-		if [ "$fastout" = false ]; then
+		if [ "$fastout" = false ] && [ $# -lt 3 ]; then
 			local text=$(echo -e "$1" | sed 's/\x1B\[[0-9;]\{1,\}[A-Za-z]//g')
 		else
 			local text=$1
 		fi
-		local str_len="${#text}"
+		
+		if [ -z "$3" ]; then
+			local str_len="${#text}"
+		else
+			local str_len=$3
+		fi
+		
 		if [ $str_len -ge $WIDTHW ]; then
 			echo -e "$1"
 			return 0
@@ -298,20 +304,20 @@ function init-all () {
 function logo () {
 	if [ "$showlogo" = true ] && [ "$verbose" = false ]; then
 		echo -ne "\033]0;av-dl - A simple audio/video downloader\a"
-		CTXT "—" "—"
+		CTXT "—" "—" "1"
 		if [ "$fastout" = false ]; then
-			CTXT "${PURPLE}⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⢤⣤⣤⣄⠀⠀⠀ ⠀ ⠀⠀⠀⠀⠀⠀                                    "
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣶⣧⣐⠍⢙⣀⣼⣿⣿⣅⣤⣀⠀⠀⠀ ⠀⠀⠀                                     "
-			CTXT "${NORMAL}⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀${PURPLE}⠉⠙⠻⣿⣿⣿⣿⣿⣯⢆⣠⠀⠀⠀⠀⠀                                      "
-			CTXT "${NORMAL}⠀⠀⠀⠠⣶⠆⠀⢀⣺⡃⣀⠀⠀⠀${PURPLE}⠈⢿⣿⣿⣿⣿⡿⠏⠉⠀ ⠀⠀                                      "
-			CTXT "⠀⠀⣸⣷⣼⠆⠀${NORMAL}⡌⢹⣿⣿⠀⢄⠀⠀${PURPLE}⠈⣿⣿⣿⣿⡉⠉⠁⠀ ⠀⠀⠀                                     "
-			CTXT "⠀⢀⣿⣿⣿⠀${NORMAL}⠸⣷⣿⣿⣿⣆⣠⣿⡄⠀${PURPLE}⣼⣿⣿⣿⢆⣠⠀⠀⠀  ⠀                                     "
-			CTXT "⠀⢸⣿⣿⣿⠂⠀${NORMAL}⠹⡿⣿⣿⣿⣿⣿⠀⠀${PURPLE}⠟⠈⠏⠀⠀.⠀⠀ ⠀⠀⠀              •                      "
-			CTXT "⠀⣿⣿⣿⠏⢰⣿⣦⡀${NORMAL}⠚⠛⢿⣿⡿⠀⠀${PURPLE}⢸⠇⢀⠀⠀⠀⠀▪⠀⠀• ⣀   ▪·⣤${RED}▄▄${PURPLE}·${RED}  ▌ ▐${PURPLE}·    ⣀   ·${RED}▄▄▄▄  ▄▄▌   ${PURPLE}"
-			CTXT "⢠⢿⣿⣿⠀⢾⣿⣿⡇⢻⡏⠀⠀⠀⠀⠀⡆⢰⣿⣿⡗⢠⣿⣿⣷⣤⣀▪ ⣀·   ⢸${RED}█ ▀█ ${PURPLE}·${RED}█${PURPLE}·${RED}█▌        ██${PURPLE}·${RED} ██ ██${PURPLE}·${RED}   ${PURPLE}"
-			CTXT "⠀⠀⠈⠙⠒⠿⠿⣿⣿⠸⠇⠀⠀⠀⠀⠀⣷⠘⣿⠟⣠⣿⣿⣿⣷⢆⣠ ▪·⠀•  ⣼${RED}█▀▀█ ▐█▐█${PURPLE}·${RED}  ▄██${PURPLE}·${RED}  ▐█${PURPLE}·${RED} ▐█▌██${PURPLE}·${RED}   ${PURPLE}"
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⣿⠀⣃⣾⣿⣿⣿⠏⠉•⠀·• ⠉ ⣀·⢸${RED}█ ${PURPLE}·${RED}▐▌ ███         ██${PURPLE}·${RED} ██ ▐█▌▐▌ ${PURPLE}"
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀•⠀ ${RED}▀  ▀ ${PURPLE}·${RED} ▀     ${PURPLE}·${RED}    ▀▀▀▀▀${PURPLE}·${RED} ${PURPLE}·${RED}▀▀▀  "
+			CTXT "${PURPLE}⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⢤⣤⣤⣄⠀⠀⠀ ⠀ ⠀⠀⠀⠀⠀⠀                                    " " " "66"
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣶⣧⣐⠍⢙⣀⣼⣿⣿⣅⣤⣀⠀⠀⠀ ⠀⠀⠀                                     " " " "66"
+			CTXT "${NORMAL}⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠀${PURPLE}⠉⠙⠻⣿⣿⣿⣿⣿⣯⢆⣠⠀⠀⠀⠀⠀                                      " " " "66"
+			CTXT "${NORMAL}⠀⠀⠀⠠⣶⠆⠀⢀⣺⡃⣀⠀⠀⠀${PURPLE}⠈⢿⣿⣿⣿⣿⡿⠏⠉⠀ ⠀⠀                                      " " " "66"
+			CTXT "⠀⠀⣸⣷⣼⠆⠀${NORMAL}⡌⢹⣿⣿⠀⢄⠀⠀${PURPLE}⠈⣿⣿⣿⣿⡉⠉⠁⠀ ⠀⠀⠀                                     " " " "66"
+			CTXT "⠀⢀⣿⣿⣿⠀${NORMAL}⠸⣷⣿⣿⣿⣆⣠⣿⡄⠀${PURPLE}⣼⣿⣿⣿⢆⣠⠀⠀⠀  ⠀                                     " " " "66"
+			CTXT "⠀⢸⣿⣿⣿⠂⠀${NORMAL}⠹⡿⣿⣿⣿⣿⣿⠀⠀${PURPLE}⠟⠈⠏⠀⠀.⠀⠀ ⠀⠀⠀              •                      " " " "66"
+			CTXT "⠀⣿⣿⣿⠏⢰⣿⣦⡀${NORMAL}⠚⠛⢿⣿⡿⠀⠀${PURPLE}⢸⠇⢀⠀⠀⠀⠀▪⠀⠀• ⣀   ▪·⣤${RED}▄▄${PURPLE}·${RED}  ▌ ▐${PURPLE}·    ⣀   ·${RED}▄▄▄▄  ▄▄▌   ${PURPLE}" " " "66"
+			CTXT "⢠⢿⣿⣿⠀⢾⣿⣿⡇⢻⡏⠀⠀⠀⠀⠀⡆⢰⣿⣿⡗⢠⣿⣿⣷⣤⣀▪ ⣀·   ⢸${RED}█ ▀█ ${PURPLE}·${RED}█${PURPLE}·${RED}█▌        ██${PURPLE}·${RED} ██ ██${PURPLE}·${RED}   ${PURPLE}" " " "66"
+			CTXT "⠀⠀⠈⠙⠒⠿⠿⣿⣿⠸⠇⠀⠀⠀⠀⠀⣷⠘⣿⠟⣠⣿⣿⣿⣷⢆⣠ ▪·⠀•  ⣼${RED}█▀▀█ ▐█▐█${PURPLE}·${RED}  ▄██${PURPLE}·${RED}  ▐█${PURPLE}·${RED} ▐█▌██${PURPLE}·${RED}   ${PURPLE}" " " "66"
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⣿⠀⣃⣾⣿⣿⣿⠏⠉•⠀·• ⠉ ⣀·⢸${RED}█ ${PURPLE}·${RED}▐▌ ███         ██${PURPLE}·${RED} ██ ▐█▌▐▌ ${PURPLE}" " " "66"
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀•⠀ ${RED}▀  ▀ ${PURPLE}·${RED} ▀     ${PURPLE}·${RED}    ▀▀▀▀▀${PURPLE}·${RED} ${PURPLE}·${RED}▀▀▀  " " " "66"
 			echo -e "${NORMAL}"
 			CTXT "A simple ${GREEN}(a)${NORMAL}udio/${GREEN}(v)${NORMAL}ideo downloader."
 			fastout=true
