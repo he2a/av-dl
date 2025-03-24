@@ -53,6 +53,9 @@ autosubs=true
 # Set false to show a text instead of logo.
 showlogo=true
 
+# Set true to speed up output but without fancy logo.
+fastout=false
+
 # Set true to enable verbose mode mainly for debugging the script.
 verbose=false
 ```
