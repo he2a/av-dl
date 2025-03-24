@@ -1,6 +1,6 @@
 # av-dl - An Audio/Video Downloader Script
 
-<p align="center"><img width=100% src="https://raw.githubusercontent.com/he2a/av-dl/master/images/preview.png alt="av-dl screenshot"></p>
+<p align="center"><img width=100% src="https://raw.githubusercontent.com/he2a/av-dl/master/images/preview.png" alt="av-dl screenshot"></p>
 
 ## Overview
 Small script to download audio or video off youtube, soundcloud and other sites supported by yt-dlp. Made for use in WSL environment in windows, but should work in any linux distro (including termux in android) without any problem. 
