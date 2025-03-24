@@ -7,11 +7,11 @@
 # A simple yt-dlp script for downloading songs or video off youtube and other sites
 # ---------------------------------------------------------------------------------
 
-# Set output path for music.
-music=~/storage/music
+# Set output path for music. If blank, will set default location to ~/Music.
+music=
 
-# Set output path for video.
-video=~/storage/movies
+# Set output path for video. If blank, will set default location to ~/Videos.
+video=
 
 # Number of retry attempts.
 attempt=3
@@ -44,7 +44,7 @@ showlogo=true
 fastout=false
 
 # Set true to enable verbose mode mainly for debugging the script.
-verbose=true
+verbose=false
 
 # ----------------------------------------------------------------------------
 
@@ -206,19 +206,28 @@ function init-all () {
 	
 	INFO "Colors available: ${RED}█${YELLOW}█${BLUE}█${PURPLE}█${CYAN}█${GREEN}█${NORMAL}█"
 	INFO "Screen width: $WIDTHW"
-	INFO "Working folder name: ${GREEN}$DIRNAME${NORMAL}"
 	
 	if [ $WIDTHW -le 65 ] && [ "$fastout" = false ]; then
 		WARN "Screen width too low, switching to fast output."
 		fastout=true
 	fi
 	
-	if [ -z "$music" ] || [ -z "$video" ]; then
-		ERRR "Default download directory not specified."
+	INFO "Working folder name: ${GREEN}$DIRNAME${NORMAL}"
+	
+	if [ -z "$music" ] || [ ! -d "$music" ]; then
+		WARN "Music directory either absent or not specified."
+		INFO "Setting directory to ~/Music."
+		music=~/Music
+	fi
+	
+	if [ -z "$video" ] || [ ! -d "$video" ]; then
+		WARN "Video directory either absent or not specified."
+		INFO "Setting directory to ~/Videos."
+		video=~/Videos
 	fi
 	
 	if [ -z "$1" ]; then
-		INFO "No URL detected."
+		WARN "No URL detected."
 	else
 		url=$(echo $1|egrep -o 'https?://[^ ]+')
 		if [ -z "$url" ]; then
@@ -340,13 +349,11 @@ function logo () {
 		fi
 		CTXT "—" "—"
 	else
-		fastout=true
 		CTXT "—" "—"
 		echo -ne "\033]0;av-dl - A simple audio/video downloader\a"
-		echo -ne "${RED}"
-		CTXT "av-dl - A simple audio/video downloader."
-		echo -ne "${NORMAL}"
+		CTXT "${RED}av-dl${NORMAL} : A simple ${GREEN}(a)${NORMAL}udio/${GREEN}(v)${NORMAL}ideo downloader"
 		CTXT "—" "—"
+		fastout=true
 	fi
 }
 
