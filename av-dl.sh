@@ -332,7 +332,7 @@ function logo () {
 			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⣿⠀⣃⣾⣿⣿⣿⠏⠉•⠀·• ⠉ ⣀·⢸${RED}█ ${PURPLE}·${RED}▐▌ ███         ██${PURPLE}·${RED} ██ ▐█▌▐▌ ${PURPLE}" " " "66"
 			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀• ⣀${RED}▌  ▀ ${PURPLE}·${RED} ▀     ${PURPLE}·${RED}    ▀▀▀▀▀${PURPLE}·${RED} ${PURPLE}·${RED}▀▀▀  " " " "66"
 			echo -e "${NORMAL}"
-			CTXT "A simple ${GREEN}(a)${NORMAL}udio/${GREEN}(v)${NORMAL}ideo downloader."
+			CTXT "A simple ${GREEN}(a)${NORMAL}udio/${GREEN}(v)${NORMAL}ideo downloader"
 			fastout=true
 		else
 			echo -ne "${RED}"
@@ -494,7 +494,8 @@ if [ $? -eq 0 ]; then
 	WARN "Title fetch failed. Using media ID from URL."
 	title=$(echo $url|sed 's/^.*v=//')
 fi
-title=$(echo "$title"|tr -d "'\?\`\"\\\/\|")
+
+title=$(echo "$title"|tr -d "'\?\`\"\\\/\|<>:\*\$")
 
 USER "${GREEN}Title:${NORMAL} $title"
 echo
