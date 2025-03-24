@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Temporary UI bugfix. Change delay if glitchy UI
-#sleep 0.1
+# sleep 0.1
 
 # ---------------------------------------------------------------------------------
 # A simple yt-dlp script for downloading songs or video off youtube and other sites
@@ -56,7 +56,7 @@ CYAN="\033[0;36m"
 GREEN="\033[0;32m"
 NORMAL="\033[0;39m"
 WIDTHW=$(stty size | sed 's/.* //g')
-DIRNAME="temp_$RANDOM"
+DIRNAME="avdl_$RANDOM"
 
 function CTXT {
 	if [ $# -eq 0 ]; then
@@ -198,11 +198,20 @@ function init-all () {
 	if [ $? -eq 0 ]; then
 		verbose=false
 	fi
-
+	
+	INFO "Initializing script."
+	
 	hash yt-dlp 2>/dev/null || ERRR "Dependency missing: yt-dlp not found."
 	hash ffmpeg 2>/dev/null || ERRR "Dependency missing: ffmpeg not found."
-
-	INFO "Initializing script."
+	
+	INFO "Colors available: ${RED}█${YELLOW}█${BLUE}█${PURPLE}█${CYAN}█${GREEN}█${NORMAL}█"
+	INFO "Screen width: $WIDTHW"
+	INFO "Working folder name: ${GREEN}$DIRNAME${NORMAL}"
+	
+	if [ $WIDTHW -le 65 ] && [ "$fastout" = false ]; then
+		WARN "Screen width too low, switching to fast output."
+		fastout=true
+	fi
 	
 	if [ -z "$music" ] || [ -z "$video" ]; then
 		ERRR "Default download directory not specified."
@@ -273,11 +282,6 @@ function init-all () {
 		fastout=false
 	fi
 	
-	if [ $WIDTHW -le 65 ] && [ "$fastout" = false ]; then
-		WARN "Screen width too low, switching to fast output."
-		fastout=true
-	fi
-	
 	case $attempt in
 		''|*[!0-9]*)
 			WARN "Invalid value for attempt detected."
@@ -313,11 +317,11 @@ function logo () {
 			CTXT "⠀⠀⣸⣷⣼⠆⠀${NORMAL}⡌⢹⣿⣿⠀⢄⠀⠀${PURPLE}⠈⣿⣿⣿⣿⡉⠉⠁⠀ ⠀⠀⠀                                     " " " "66"
 			CTXT "⠀⢀⣿⣿⣿⠀${NORMAL}⠸⣷⣿⣿⣿⣆⣠⣿⡄⠀${PURPLE}⣼⣿⣿⣿⢆⣠⠀⠀⠀  ⠀                                     " " " "66"
 			CTXT "⠀⢸⣿⣿⣿⠂⠀${NORMAL}⠹⡿⣿⣿⣿⣿⣿⠀⠀${PURPLE}⠟⠈⠏⠀⠀.⠀⠀ ⠀⠀⠀              •                      " " " "66"
-			CTXT "⠀⣿⣿⣿⠏⢰⣿⣦⡀${NORMAL}⠚⠛⢿⣿⡿⠀⠀${PURPLE}⢸⠇⢀⠀⠀⠀⠀▪⠀⠀• ⣀   ▪·⣤${RED}▄▄${PURPLE}·${RED}  ▌ ▐${PURPLE}·    ⣀   ·${RED}▄▄▄▄  ▄▄▌   ${PURPLE}" " " "66"
+			CTXT "⠀⣿⣿⣿⠏⢰⣿⣦⡀${NORMAL}⠚⠛⢿⣿⡿⠀⠀${PURPLE}⢸⠇⢀⠀⠀⠀⠀▪⠀⠀• ⣀    ▪·⣤${RED}▄▄${PURPLE}·${RED}  ▌ ▐${PURPLE}·    ⣀   ·${RED}▄▄▄▄  ▄▄▌   ${PURPLE}" " " "66"
 			CTXT "⢠⢿⣿⣿⠀⢾⣿⣿⡇⢻⡏⠀⠀⠀⠀⠀⡆⢰⣿⣿⡗⢠⣿⣿⣷⣤⣀▪ ⣀·   ⢸${RED}█ ▀█ ${PURPLE}·${RED}█${PURPLE}·${RED}█▌        ██${PURPLE}·${RED} ██ ██${PURPLE}·${RED}   ${PURPLE}" " " "66"
 			CTXT "⠀⠀⠈⠙⠒⠿⠿⣿⣿⠸⠇⠀⠀⠀⠀⠀⣷⠘⣿⠟⣠⣿⣿⣿⣷⢆⣠ ▪·⠀•  ⣼${RED}█▀▀█ ▐█▐█${PURPLE}·${RED}  ▄██${PURPLE}·${RED}  ▐█${PURPLE}·${RED} ▐█▌██${PURPLE}·${RED}   ${PURPLE}" " " "66"
 			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⢸⣧⠀⠀⠀⠀⠀⠀⣿⠀⣃⣾⣿⣿⣿⠏⠉•⠀·• ⠉ ⣀·⢸${RED}█ ${PURPLE}·${RED}▐▌ ███         ██${PURPLE}·${RED} ██ ▐█▌▐▌ ${PURPLE}" " " "66"
-			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀•⠀ ${RED}▀  ▀ ${PURPLE}·${RED} ▀     ${PURPLE}·${RED}    ▀▀▀▀▀${PURPLE}·${RED} ${PURPLE}·${RED}▀▀▀  " " " "66"
+			CTXT "⠀⠀⠀⠀⠀⠀⠀⠀⠸⠻⠀⠀⠀⠀⠀⠀⢄⣸⣿⣿⣿⣿⣭⣭⡉⠉⠁· .⠀⠀• ⣀${RED}▌  ▀ ${PURPLE}·${RED} ▀     ${PURPLE}·${RED}    ▀▀▀▀▀${PURPLE}·${RED} ${PURPLE}·${RED}▀▀▀  " " " "66"
 			echo -e "${NORMAL}"
 			CTXT "A simple ${GREEN}(a)${NORMAL}udio/${GREEN}(v)${NORMAL}ideo downloader."
 			fastout=true
@@ -496,7 +500,7 @@ if [ "$cho" == "n" ]; then
 fi
 
 case $cho in
-	a | A | 1)
+	a | A | audio | 1)
 		USER "User choice detected as ${GREEN}(a)${NORMAL}udio."
 		echo
 		INFO "Creating temporary folder ${GREEN}$DIRNAME${NORMAL}"
@@ -535,7 +539,7 @@ case $cho in
 		echo
 	;;
 
-	v | V | 2)
+	v | V | video | 2)
 		USER "User choice detected as ${GREEN}(v)${NORMAL}ideo."
 		echo
 		INFO "Creating temporary folder ${GREEN}$DIRNAME${NORMAL}"
