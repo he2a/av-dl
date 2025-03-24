@@ -1,5 +1,8 @@
 # av-dl - An Audio/Video Downloader Script
 
+<p align="center"><img width=100% src="https://raw.githubusercontent.com/he2a/av-dl/master/images/preview.png alt="av-dl screenshot"></p>
+
+## Overview
 Small script to download audio or video off youtube, soundcloud and other sites supported by yt-dlp. Made for use in WSL environment in windows, but should work in any linux distro (including termux in android) without any problem. 
 
 ## Features
@@ -9,7 +12,6 @@ This script has two basic behaviours for different content.
 
 ## Requirement
 - `yt-dlp` for downloading video/audio.
-- `python 3.6+` for running yt-dlp.
 - `ffmpeg` for media conversion.
 
 ## Installation
@@ -26,7 +28,7 @@ video=~/storage/movies
 # Number of retry attempts.
 attempt=3
 
-# Force default choice of download. Set 'audio' for audio / 'video' for video / blank for manual choice.
+# Force default choice of download. Set to 'audio' for audio / 'video' for video / blank for manual choice.
 defchoice=
 
 # Set true to embed cover for audio download.
@@ -35,17 +37,17 @@ embedcover=true
 # Set true to use thumbnail as cover for audio download or false to use default cover.
 coverthumb=true
 
-# Link to the cover image for use as default cover, including https:// part.
-thumblink=
-
-# Set true to autotrim cover to square for audio download.
+# Set true to autotrim youtube thumbnail to square for audio download.
 autotrimthumb=true
+
+# Set true to detect black bars in youtube thumbnail.
+smartcrop=true
 
 # Set true to embed subtitles for video download.
 embedsubs=true
 
 # Set true to embed auto translated subtitles for youtube videos.
-autosubs=false
+autosubs=true
 
 # Set false to show a text instead of logo.
 showlogo=true
